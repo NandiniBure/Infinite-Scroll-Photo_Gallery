@@ -1,95 +1,93 @@
-import Image from "next/image";
-import styles from "./page.module.css";
+"use client";
 
-export default function Home() {
+import { useState, useEffect } from "react";
+import axios from "axios";
+import "./styles/globals.css";
+
+const Home = () => {
+  const [photos, setPhotos] = useState([]);
+  const [page, setPage] = useState(1);
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState(null);
+
+  // Check if data is already cached
+  const loadCachedPhotos = () => {
+    const cachedPhotos = localStorage.getItem("photos");
+    if (cachedPhotos) {
+      setPhotos(JSON.parse(cachedPhotos));
+    }
+  };
+
+  const fetchPhotos = async (pageNum) => {
+    setLoading(true);
+    setError(null);
+    try {
+      const response = await axios.get("https://api.unsplash.com/photos", {
+        params: {
+          client_id: "V8SnZ4RY7DknZE6uxg7vEIVgBQI91B67x-v_d_QoFZM", // Use env variables for security
+          page: pageNum,
+          per_page: 12,
+        },
+      });
+      const newPhotos = response.data;
+      setPhotos((prevPhotos) => {
+        const updatedPhotos = [...prevPhotos, ...newPhotos];
+        // Cache the photos in localStorage
+        localStorage.setItem("photos", JSON.stringify(updatedPhotos));
+        return updatedPhotos;
+      });
+    } catch (err) {
+      setError("Failed to load photos. Please try again.");
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  useEffect(() => {
+    loadCachedPhotos(); // Load cached photos if available
+    fetchPhotos(page); // Fetch new photos
+  }, [page]);
+
+  const handleScroll = () => {
+    if (
+      window.innerHeight + document.documentElement.scrollTop >=
+      document.documentElement.offsetHeight - 10 // Triggering when near the bottom
+    ) {
+      if (!loading) {
+        setPage((prevPage) => prevPage + 1);
+      }
+    }
+  };
+
+  useEffect(() => {
+    window.addEventListener("scroll", handleScroll);
+
+    return () => {
+      window.removeEventListener("scroll", handleScroll);
+    };
+  }, [loading]);
+
   return (
-    <div className={styles.page}>
-      <main className={styles.main}>
-        <Image
-          className={styles.logo}
-          src="/next.svg"
-          alt="Next.js logo"
-          width={180}
-          height={38}
-          priority
-        />
-        <ol>
-          <li>
-            Get started by editing <code>app/page.js</code>.
-          </li>
-          <li>Save and see your changes instantly.</li>
-        </ol>
-
-        <div className={styles.ctas}>
-          <a
-            className={styles.primary}
-            href="https://vercel.com/new?utm_source=create-next-app&utm_medium=appdir-template&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            <Image
-              className={styles.logo}
-              src="/vercel.svg"
-              alt="Vercel logomark"
-              width={20}
-              height={20}
+    <div className="container">
+      <h1 className="header">Photo Gallery</h1>
+      <div className="gallery">
+        {photos.map((photo, index) => (
+          <div className="photo" key={`${photo.id}-${index}`} role="listitem">
+            {" "}
+            {/* Use unique key and ARIA role */}
+            <img
+              src={photo.urls.small}
+              alt={photo.alt_description || "Unsplash Photo"} // Alt description for accessibility
+              className="photo-img"
+              loading="lazy" // Lazy load the images
             />
-            Deploy now
-          </a>
-          <a
-            href="https://nextjs.org/docs?utm_source=create-next-app&utm_medium=appdir-template&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-            className={styles.secondary}
-          >
-            Read our docs
-          </a>
-        </div>
-      </main>
-      <footer className={styles.footer}>
-        <a
-          href="https://nextjs.org/learn?utm_source=create-next-app&utm_medium=appdir-template&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Image
-            aria-hidden
-            src="/file.svg"
-            alt="File icon"
-            width={16}
-            height={16}
-          />
-          Learn
-        </a>
-        <a
-          href="https://vercel.com/templates?framework=next.js&utm_source=create-next-app&utm_medium=appdir-template&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Image
-            aria-hidden
-            src="/window.svg"
-            alt="Window icon"
-            width={16}
-            height={16}
-          />
-          Examples
-        </a>
-        <a
-          href="https://nextjs.org?utm_source=create-next-app&utm_medium=appdir-template&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Image
-            aria-hidden
-            src="/globe.svg"
-            alt="Globe icon"
-            width={16}
-            height={16}
-          />
-          Go to nextjs.org →
-        </a>
-      </footer>
+          </div>
+        ))}
+      </div>
+      {loading && <div className="loading">Loading...</div>}
+      {error && <div className="error">{error}</div>}
     </div>
   );
-}
+};
+
+export default Home;
