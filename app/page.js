@@ -24,7 +24,7 @@ const Home = () => {
     try {
       const response = await axios.get("https://api.unsplash.com/photos", {
         params: {
-          client_id: "V8SnZ4RY7DknZE6uxg7vEIVgBQI91B67x-v_d_QoFZM", // Use env variables for security
+          client_id:"V8SnZ4RY7DknZE6uxg7vEIVgBQI91B67x-v_d_QoFZM", // Use env variables for security
           page: pageNum,
           per_page: 12,
         },
