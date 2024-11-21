@@ -10,16 +10,14 @@ This is a photo gallery web application built using React and the Unsplash API. 
 - **Frontend**: React, Axios, CSS (TailwindCSS or other styling library)
 - **Backend (Optional)**: None (Only using Unsplash API)
 
+## Live Demo
+Check out the live demo of the Photo Gallery application here:  
+[Live Demo](https://infinite-scroll-photo-gallery.vercel.app/)
+
 ## Installation
 
 Follow the steps below to run the project locally:
 
 1. Clone the repository:
-                 ```bash
+   ```bash
    git clone https://github.com/your-username/photo-gallery.git
- 
-    ```bash
-  npm install
- ```bash
-   npm run dev
-
