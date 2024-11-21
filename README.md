@@ -17,7 +17,10 @@ Follow the steps below to run the project locally:
 1. Clone the repository:
    ```bash
    git clone https://github.com/your-username/photo-gallery.git
-
+ 
+ ```bash
   npm install
+
+```bash
   npm run dev
 
